@@ -210,6 +210,9 @@ print (r,err)
         #
         rn = Fdf.newton_step(fun_fdf, r) 
         return (rn, np.abs(rn - r))
+    #
 
     def __getitem__(self,i):
         return Fdf(self.f.__getitem__(i),self.df.__getitem__(i))
+    #
+#
