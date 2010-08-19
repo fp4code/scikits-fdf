@@ -49,13 +49,15 @@ print (r,err)
     @staticmethod
     def variable(x):
         """Constructs a Fdf variable from its value. The derivative is 1"""
-        return Fdf(x,np.ones_like(x))
+        xa = np.asarray(x)
+        return Fdf(xa,np.ones_like(xa))
     #
 
     @staticmethod
     def constant(x):
         """Constructs a Fdf constant from its value. The derivative is 0"""
-        return Fdf(x,np.zeros_like(x))
+        xa = np.asarray(x)
+        return Fdf(xa,np.zeros_like(xa))
     #
 
     def __str__(self):
@@ -85,7 +87,16 @@ print (r,err)
             return Fdf(self.f - a.f, self.df - a.df)
         #
         else:
-            return Fdf(self.f - a.f, self.df)
+            return Fdf(self.f - a, self.df)
+        #
+    #
+
+    def __rsub__(self,a):
+        if isinstance(a,Fdf):
+            return Fdf(a.f - self.f, a.df - self.df)
+        #
+        else:
+            return Fdf(a - self.f, -self.df)
         #
     #
 
@@ -125,7 +136,7 @@ print (r,err)
     #
 
     def __rdiv__(self,a):
-        return self.inv() * a
+        return a * self.inv()
     #
 
     def __pow__(self,a):
