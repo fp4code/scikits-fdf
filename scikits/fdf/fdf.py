@@ -46,23 +46,12 @@ print (r,err)
         self.f,self.df = f,df
     #
 
-    @staticmethod
-    def variable(x):
-        """Constructs a Fdf variable from its value. The derivative is 1"""
-        xa = np.asarray(x)
-        return Fdf(xa,np.ones_like(xa))
-    #
-
-    @staticmethod
-    def constant(x):
-        """Constructs a Fdf constant from its value. The derivative is 0"""
-        xa = np.asarray(x)
-        return Fdf(xa,np.zeros_like(xa))
-    #
-
     def __str__(self):
-        return '('+self.f.__str__()+','+self.df.__str__()+')'
+        return '(' + self.f.__str__() + ', ' + self.df.__str__() + ')'
     #
+
+    def __repr__(self):
+        return 'Fdf(' + self.f.__repr__() + ', ' + self.df.__repr__() + ')'
 
     def __add__(self,a):
         if isinstance(a,Fdf):
@@ -161,69 +150,92 @@ print (r,err)
         #
     #
 
-    def sqrt(self, funsqrt = np.sqrt):
-        s = funsqrt(self.f)
-        return Fdf(s,0.5*self.df/s)
-    #
-    
-    class Sqrt_near:
-        def __init__(self, value):
-            self.near = sqrts.Near(value)
-        #
-        def sqrt(self,fdf):
-            s = self.sqrt(fdf.f)
-            return Fdf(s,0.5*fdf.df/s)
-        #
-    #
-
-    def square(self):
-        return Fdf(np.square(self.f),2*self.df*self.f)
-    #
-
-    def sin(self):
-        return Fdf(np.sin(self.f),self.df*np.cos(self.f))
-    #
-
-    def cos(self):
-        return Fdf(np.cos(self.f),-self.df*np.sin(self.f))
-    #
-
-    def sincos(self):
-        s = np.sin(self.f)
-        c = np.cos(self.f)
-        return Fdf(s,self.df*c),Fdf(c,-self.df*s)
-    #
-
-    def exp(self):
-        e = np.exp(self.f)
-        return Fdf(e,self.df*e)
-    #
-
-    def expi(self):
-        e = np.exp(1j*self.f)
-        return Fdf(e,1j*self.df*e)
-    #
-
-    def log(self):
-        return Fdf(np.log(self.f), self.df/self.f)
-    #
-
-    @staticmethod
-    def newton_step(fun_fdf, r):
-        fdf = fun_fdf(r)
-        return (r - fdf.f/fdf.df)
-    #
-
-    @staticmethod
-    def newton_ten_steps(fun_fdf, r):
-        for i in xrange(10):
-            r = Fdf.newton_step(fun_fdf, r)
-        #
-        rn = Fdf.newton_step(fun_fdf, r) 
-        return (rn, np.abs(rn - r))
-    #
-
     def __getitem__(self,i):
         return Fdf(self.f.__getitem__(i),self.df.__getitem__(i))
     #
 #
+
+def variable(x):
+    """Constructs a Fdf variable from its value. The derivative is 1"""
+    if not np.isscalar(x):
+        x = np.asarray(x)
+    #
+    return Fdf(x,np.ones_like(x))
+#
+
+def constant(x):
+    """Constructs a Fdf constant from its value. The derivative is 0"""
+    if not np.isscalar(x):
+        x = np.asarray(x)
+    #
+    return Fdf(x,np.zeros_like(x))
+#
+
+def sqrt(v, funsqrt = np.sqrt):
+    s = funsqrt(v.f)
+    return Fdf(s,0.5*v.df/s)
+#
+Fdf.sqrt = sqrt
+    
+class Sqrt_near:
+    def __init__(self, value):
+        self.near = sqrts.Near(value)
+    #
+    def sqrt(self,fdf):
+        s = self.sqrt(fdf.f)
+        return Fdf(s,0.5*fdf.df/s)
+    #
+#   
+
+def square(v):
+    return Fdf(np.square(v.f),2*v.df*v.f)
+#
+Fdf.square = square
+
+def sin(v):
+    return Fdf(np.sin(v.f),v.df*np.cos(v.f))
+#
+Fdf.sin = sin
+
+def cos(v):
+    return Fdf(np.cos(v.f),-v.df*np.sin(v.f))
+#
+Fdf.cos = cos
+
+def sincos(v):
+    s = np.sin(v.f)
+    c = np.cos(v.f)
+    return Fdf(s,v.df*c),Fdf(c,-v.df*s)
+#
+Fdf.sincos = sincos
+
+def exp(v):
+    e = np.exp(v.f)
+    return Fdf(e,v.df*e)
+#
+Fdf.exp = exp
+
+def expi(v):
+    e = np.exp(1j*v.f)
+    return Fdf(e,1j*v.df*e)
+#
+Fdf.expi = expi
+
+def log(v):
+    return Fdf(np.log(v.f), v.df/v.f)
+#
+Fdf.log = log
+
+def newton_step(fun_fdf, r):
+    fdf = fun_fdf(r)
+    return (r - fdf.f/fdf.df)
+#
+
+def newton_ten_steps(fun_fdf, r):
+    for i in xrange(10):
+        r = Fdf.newton_step(fun_fdf, r)
+    #
+    rn = Fdf.newton_step(fun_fdf, r) 
+    return (rn, np.abs(rn - r))
+#
+
