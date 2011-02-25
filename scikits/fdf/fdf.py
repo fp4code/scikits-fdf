@@ -115,7 +115,7 @@ print (r,err)
         return Fdf(1.0 / self.f, - self.df / (self.f**2))
     #
 
-    def __div__(self,a):
+    def __truediv__(self,a):
         if isinstance(a,Fdf):
             return self * Fdf.inv(a)
         #
@@ -124,9 +124,13 @@ print (r,err)
         #
     #
 
-    def __rdiv__(self,a):
+    __div__ = __truediv__
+
+    def __rtruediv__(self,a):
         return a * self.inv()
     #
+
+    __rdiv__ = __rtruediv__
 
     def __pow__(self,a):
         if isinstance(a,Fdf):
