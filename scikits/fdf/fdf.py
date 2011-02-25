@@ -179,11 +179,11 @@ Fdf.sqrt = sqrt
     
 class Sqrt_near:
     def __init__(self, value):
-        self.near = sqrts.Near(value)
+        self.near = sqrts.Nearest(value)
     #
-    def sqrt(self,fdf):
-        s = self.sqrt(fdf.f)
-        return Fdf(s,0.5*fdf.df/s)
+    def sqrt(self,_fdf):
+        s = self.near.sqrt(_fdf.f)
+        return Fdf(s,0.5*_fdf.df/s)
     #
 #   
 
