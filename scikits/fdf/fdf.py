@@ -237,9 +237,8 @@ def newton_step(fun_fdf, r):
 
 def newton_ten_steps(fun_fdf, r):
     for i in xrange(10):
-        r = Fdf.newton_step(fun_fdf, r)
+        r = newton_step(fun_fdf, r)
     #
-    rn = Fdf.newton_step(fun_fdf, r) 
+    rn = newton_step(fun_fdf, r) 
     return (rn, np.abs(rn - r))
 #
-
